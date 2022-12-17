@@ -17,6 +17,7 @@ This plugin helps you to create a cart for your WooCommerce store through API.
 1. Add a cart
    - Endpoint: `http://yourdomain.com/wp-json/ade-woocart-no-auth/v1/cart`
    - Method: `POST`
+   - Authentication: Basic authentication
    - Body:
    ```json
    {
@@ -58,6 +59,7 @@ This plugin helps you to create a cart for your WooCommerce store through API.
 
    - Endpoint: `http://yourdomain.com/wp-json/ade-woocart-no-auth/v1/cart`
    - Method: `GET`
+   - Authentication: Basic authentication
    - Body:
 
    ```json
@@ -92,6 +94,7 @@ This plugin helps you to create a cart for your WooCommerce store through API.
 3. Delete a cart
    - Endpoint: `http://yourdomain.com/wp-json/ade-woocart-no-auth/v1/cart`
    - Method: `DELETE`
+   - Authentication: Basic authentication
    - Body:
    ```json
    {
