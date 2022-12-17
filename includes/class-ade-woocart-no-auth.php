@@ -5,6 +5,8 @@ if (!defined('ABSPATH')) {
 }
 class AdeWooCartNoAuth
 {
+    public $user;
+
     public function init()
     {
         //rest api init
@@ -70,10 +72,55 @@ class AdeWooCartNoAuth
         return true;
     }
 
+    //authenticate
+    public function wooAuth($consumer_key, $consumer_secret)
+    {
+        // Stop if don't have any key.
+        if (!$consumer_key || !$consumer_secret) {
+            return false;
+        }
+
+        // Get user data.
+        $this->user = $this->get_user_data_by_consumer_key($consumer_key);
+        if (empty($this->user)) {
+            return false;
+        }
+
+        // Validate user secret.
+        if (!hash_equals($this->user->consumer_secret, $consumer_secret)) { // @codingStandardsIgnoreLine
+            return false;
+        }
+
+        return true;
+    }
+
+    //user data
+    private function get_user_data_by_consumer_key($consumer_key)
+    {
+        global $wpdb;
+
+        $consumer_key = wc_api_hash(sanitize_text_field($consumer_key));
+        $user         = $wpdb->get_row(
+            $wpdb->prepare(
+                "
+			SELECT key_id, user_id, permissions, consumer_key, consumer_secret, nonces
+			FROM {$wpdb->prefix}woocommerce_api_keys
+			WHERE consumer_key = %s
+		",
+                $consumer_key
+            )
+        );
+
+        return $user;
+    }
+
     //permissions_check
     public function permissions_check()
     {
-        return true;
+        $wc_ck = $_SERVER['PHP_AUTH_USER'];
+        $wc_cs = $_SERVER['PHP_AUTH_PW'];
+        //validate the credentials
+        return $this->wooAuth($wc_ck, $wc_cs);
     }
 
     //logUser
