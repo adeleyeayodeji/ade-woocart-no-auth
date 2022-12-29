@@ -33,6 +33,13 @@ class AdeWooCartNoAuth
             'callback' => array($this, 'remove_from_cart'),
             'permission_callback' => array($this, 'permissions_check'),
         ));
+
+        //clear all cart
+        register_rest_route('ade-woocart-no-auth/v1', '/clear_cart', array(
+            'methods' => 'PUT',
+            'callback' => array($this, 'clear_cart'),
+            'permission_callback' => array($this, 'permissions_check'),
+        ));
     }
 
     //woo support
@@ -206,6 +213,23 @@ class AdeWooCartNoAuth
         WC()->cart->remove_cart_item($key);
         return new WP_REST_Response([
             'message' => 'Item removed from cart',
+            'cart' => $this->get_cart($request),
+        ], 200);
+    }
+
+    //clear_cart
+    public function clear_cart(WP_REST_Request $request)
+    {
+        $user_id = $request->get_param('user_id');
+        //check if user exists
+        if (!get_user_by('id', $user_id)) {
+            return new WP_Error('user_not_found', 'User not found', array('status' => 404));
+        }
+        //log user
+        $this->logUser($user_id);
+        WC()->cart->empty_cart();
+        return new WP_REST_Response([
+            'message' => 'Cart cleared',
             'cart' => $this->get_cart($request),
         ], 200);
     }
